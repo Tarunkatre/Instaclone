@@ -1,0 +1,130 @@
+<% include ./partials/header.ejs %>
+<div class="w-full min-h-screen bg-zinc-900 text-white py-5">
+  <div class="w-full px-4 flex items-center justify-between">
+    <img class="w-1/4" src="/images/logo.png" alt="">
+    <div class="icons -mt-2 flex gap-5 items-center">
+      <i class="text-[1.4rem] ri-heart-3-line"></i>
+      <i class="text-[1.4rem] ri-messenger-line"></i>
+    </div>
+  </div>
+  <div class="story px-3 flex gap-3 overflow-auto mt-5">
+    <a href="/story/<%=user._id%>/0">
+      <div id='' class="circle flex-shrink-0">
+        <div class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center">
+          <div class="inner w-[92%] h-[92%] rounded-full overflow-hidden">
+            <img class="w-full h-full object-cover" src="/images/upload/<%= user.pic%>" alt="">
+          </div>
+        </div>
+      </div>
+    </a>
+    <% pack.forEach(function(story){%>
+      <%if(story.user != user){%>
+    <a href="/story/<%=story.user._id%>/0">
+      <div class="circle flex-shrink-0">
+        <div class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center">
+          <div class="inner w-[92%] h-[92%] rounded-full overflow-hidden">
+            <img class="w-full h-full object-cover" src="/images/upload/<%= story.user.pic%>" alt="">
+          </div>
+        </div>
+      </div>
+    </a>
+          <%}%>
+      <%})%>
+  </div>
+  <%posts.reverse().forEach(function(post){%>
+  <div class="posts mb-20">
+    <div class="post relative mt-10 w-full min-h-[50vh]">
+      <div class="title px-4 flex items-center gap-2">
+        <div class="w-[8vw] h-[8vw] bg-sky-100 rounded-full overflow-hidden">
+          <img class="w-full h-full object-cover" src="/images/upload/<%= post.user.pic%>" alt="">
+        </div>
+        <h4 class="text-sm"><%= post.user.username%></h4>
+        <h6 class="text-xs opacity-30"><%=post.date.toLocaleString()%></h6>
+      </div>
+      <div class="w-full h-96 mt-4 bg-sky-100 overflow-hidden">
+        <img class='img w-full h-full' src="/images/upload/<%=post.pic%>" alt="">
+      </div>
+      <div class="options w-full px-4 flex justify-between items-center text-[1.4rem]">
+        <div class="flex gap-3 mt-2">
+          <i data-id='<%=post._id%>' class="like <%= post.likes.includes(post.user._id) ? 'text-red-500 ri-heart-3-fill':'ri-heart-3-line'%>"></i>
+          <i class="ri-chat-3-line"></i>
+          <i class="ri-share-circle-line"></i>
+        </div>
+        <i data-id='<%= post._id%>' class="save <%= post.saved.includes(post.user._id) ? 'text-white-500 ri-bookmark-fill':'ri-bookmark-line'%>"></i>
+      </div>
+      <h3 class="likeCount px-4 mt-2 text-sm leading-none tracking-tight"><%= post.likes.length%> likes</h3>
+      <h2 class="text-white font-light text-sm mt-2"><span class="font-semibold pl-4 pr-2"><%= post.user.username%></span><%= post.caption%></h2>
+    </div>
+    <%})%>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js" integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  save();
+
+  function heartAnim(elem) {
+    const i = document.createElement('i')
+    i.classList.add('ri-heart-3-fill', 'text-red-500', 'z-20', 'absolute', 'text-7xl', 'top-1/2', 'left-1/2', '-translate-x-1/2', '-translate-y-1/2')
+    elem.appendChild(i)
+    gsap.from(i, {
+      y: 20,
+      scale: 0.5,
+      duration: 0.4,
+      ease: 'linear',
+      onComplete: function() {
+        elem.removeChild(i)
+      }
+    })
+  }
+
+  function like(icon, count) {
+    axios.get(`/post/like/${icon.dataset.id}`)
+      .then(function(response) {
+        if (icon.classList.contains('ri-heart-3-line')) {
+          icon.classList.remove('ri-heart-3-line')
+          icon.classList.add('text-red-500', 'ri-heart-3-fill');
+        } else {
+          icon.classList.remove('text-red-500', 'ri-heart-3-fill')
+          icon.classList.add('ri-heart-3-line');
+        }
+        count.textContent = response.data.likes.length + ' likes';
+      })
+  }
+
+  document.querySelector('.posts').addEventListener('click', function(e) {
+    const icon = e.target
+    const count = e.target.parentNode.parentNode.parentNode.querySelector('.likeCount')
+    if (e.target.classList.contains('like')) {
+      heartAnim(e.target.parentNode.parentNode.parentNode);
+      like(icon, count);
+    }
+  })
+  document.querySelector('.posts').addEventListener('click', function(e) {
+    const icon = e.target.parentNode.parentNode.querySelector('.like')
+    const count = e.target.parentNode.parentNode.querySelector('.likeCount')
+    if (e.target.classList.contains('img')) {
+      heartAnim(e.target.parentNode.parentNode);
+      like(icon, count)
+    }
+  })
+
+  function save() {
+    document.querySelector('.posts').addEventListener('click', function(e) {
+      const icon = e.target
+      if (e.target.classList.contains('save')) {
+        axios.get(`/post/save/${e.target.dataset.id}`)
+          .then(function(response) {
+            if (icon.classList.contains('ri-bookmark-line')) {
+              icon.classList.remove('ri-bookmark-line')
+              icon.classList.add('text-white-500', 'ri-bookmark-fill');
+            } else {
+              icon.classList.remove('text-white-500', 'ri-bookmark-fill')
+              icon.classList.add('ri-bookmark-line');
+            }
+          })
+      }
+    })
+  }
+</script>
+<% include ./partials/footer.ejs %>

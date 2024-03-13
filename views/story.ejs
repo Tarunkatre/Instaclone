@@ -1,0 +1,33 @@
+<%include ./partials/header.ejs%>
+
+<div class="container w-full min-h-screen bg-zinc-900 text-white ">
+    <div class="head bg-gradient-to-b from-gray-600 to-transparent absolute w-full h-16">
+        <div class="name flex p-3 w-full h-3/4" gap-5>
+            <a href="/feed"><i class="ri-arrow-left-double-line"></i></a>
+            <h1 class="text-lg font-sans flex gap-3 mx-3">
+              <div class="w-6 h-6 bg-zinc-300 rounded-full overflow-hidden"><img class='w-full h-full object-cover' src="/images/upload/<%=storyUser.pic%>" alt=""></div><%=storyUser.username%>
+            </h1>
+        </div>
+        <div class="cont flex justify-center w-full ">
+          <div class="progress-container w-11/12 h-1 flex justify-start bg-gray-400 rounded overflow-hidden">
+            <div class="progress h-1 bg-white w-0 rounded"></div>
+          </div>
+        </div>
+    </div>
+    <img class='w-screen h-screen object-fill center' src="/images/upload/<%=storyUser.stories[number].pic%>" alt="">
+</div>
+<script>
+  let no = `<%= number%>`
+  let bar = document.querySelector('.progress')
+  let count = 0;
+    let int = setInterval(function(){
+      if(count <= 100){
+        bar.style.width = count++ + '%';
+      }else{
+        clearInterval(int)
+        window.location.href = `/story/<%=storyUser._id%>/${Number(no)+1}`
+        
+      }
+    },30)
+</script>
+<%include ./partials/footer.ejs%>
