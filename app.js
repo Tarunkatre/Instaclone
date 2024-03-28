@@ -5,8 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var passport = require('passport');
 var expressSession = require('express-session');
+require('dotenv').config({path: './.env'})
 
-
+require('./models/db.js').connect()
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
