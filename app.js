@@ -6,6 +6,7 @@ var logger = require('morgan');
 var passport = require('passport');
 var expressSession = require('express-session');
 require('dotenv').config({path: './.env'})
+var flash = require('connect-flash');
 
 require('./models/db.js').connect()
 var indexRouter = require('./routes/index');
@@ -18,6 +19,8 @@ app.use(expressSession({
   saveUninitialized: false,
   secret: 'aaaaaaaaaaaa',
 }))
+
+app.use(flash())
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

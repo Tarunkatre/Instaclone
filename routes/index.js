@@ -12,11 +12,11 @@ const users = require('./users');
 passport.use(new localStrategy(userModel.authenticate()));
 
 router.get('/', function (req, res) {
-  res.render('login', { footer: false });
+  res.render('login', { footer: false, error:req.flash('error') });
 });
 
 router.get('/newAccount', function (req, res) {
-  res.render('index', { footer: false });
+  res.render('index', { footer: false, error: req.flash('error') });
 });
 
 router.get('/feed', isLoggedIn, async function (req, res) {
@@ -150,14 +150,16 @@ router.post('/register', function (req, res) {
       })
     })
     .catch((err) => {
-      res.send(err);
+      req.flash('error', err.message)
+      res.redirect('/newAccount')
     })
 })
 
 
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/feed',
-  failureRedirect: '/'
+  failureRedirect: '/',
+  failureFlash:true
 }), function (req, res) { })
 
 
