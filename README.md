@@ -1,6 +1,6 @@
-Instagram Clone
+# Instagram Clone
 
-link :- https://instaclone-7veo.onrender.com/
+## link :- https://instaclone-7veo.onrender.com/
 
 This is a basic Instagram Clone featuring register,login of a user,view/upload post and story.
 
